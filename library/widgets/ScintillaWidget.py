@@ -10,11 +10,9 @@ Created on 2017年11月9日
 @description: 
 """
 from PyQt5.Qsci import QsciScintilla, QsciLexerPython
-from PyQt5.QtCore import Qt, QEvent
-from PyQt5.QtGui import QFont, QColor, QFontMetrics
+from PyQt5.QtCore import Qt
+from PyQt5.QtGui import QFont, QColor
 import chardet
-
-from library import Settings
 
 
 __Author__ = "By: Irony.\"[讽刺]\nQQ: 892768447\nEmail: 892768447@qq.com"
@@ -27,14 +25,20 @@ class ScintillaWidget(QsciScintilla):
     def __init__(self, *args, **kwargs):
         super(ScintillaWidget, self).__init__(*args, **kwargs)
         self.setAttribute(Qt.WA_InputMethodEnabled, False)  # for android
+        self.init()
         self._lexer = QsciLexerPython(self)
         self.setLexer(self._lexer)
-        self.init()
         self.initStyle()
+        self.linesChanged.connect(self.onLinesChanged)
+
+    def onLinesChanged(self):
+        '''
+        # 动态设置行号宽度
+        '''
+        self.setMarginWidth(0, self.fontMetrics().width(str(self.lines())) + 5)
 
     def init(self):
-        # 折叠前后颜色?
-        #         self.setFoldMarginColors(fore, back)
+        font = self.initFont()
         # 设置提示显示方式,参考http://pyqt.sourceforge.net/Docs/QScintilla2/classQsciScintilla.html#a3793111b6e2a86351c798c68deda7d0c
         self.setAnnotationDisplay(self.AnnotationBoxed)
         # 自动提示-不区分大小写
@@ -71,24 +75,24 @@ class ScintillaWidget(QsciScintilla):
         self.setCallTipsPosition(self.CallTipsBelowText)  # 文字下方
         # 设置提示样式
         self.setCallTipsStyle(self.CallTipsNoContext)
-        # 设置插入字符前景颜色
-#         self.setCaretForegroundColor()
-        # 设置插入线背景颜色
-#         self.setCaretLineBackgroundColor()
-        # 设置是否显示插入线
-#         self.setCaretLineVisible(True)
-        # 设置插入字符宽度
+        # 设置当前行前景颜色
+        self.setCaretForegroundColor(Qt.white)
+        # 设置当前行背景颜色
+        self.setCaretLineBackgroundColor(QColor("#2D2D2D"))
+        # 设置是否显示当前行
+        self.setCaretLineVisible(True)
+        # Sets the width of the caret to width pixels. A width of 0 makes the caret invisible.
 #         self.setCaretWidth(1)
-        # 设置很多颜色
-#         self.setColor()
+        # 设置字体颜色
+        self.setColor(QColor("#F8F8F2"))
         #
 #         self.setContractedFolds(    const QList< int > &     folds)
         #
-#         self.setEdgeColor()
+#         self.setEdgeColor(QColor("#BBB8B5"))
         #
-#         self.setEdgeColumn()
+#         self.setEdgeColumn(150)
         # 参考http://pyqt.sourceforge.net/Docs/QScintilla2/classQsciScintilla.html#a40b8ec37e068b12d9c83ee497929a00e
-#         self.setEdgeMode()
+#         self.setEdgeMode(self.EdgeLine)
         # 设置换行模式?参考http://pyqt.sourceforge.net/Docs/QScintilla2/classQsciScintilla.html#ab4b6b4286a74e173a86de0a7f55241d5
         # 默认为和系统相关
 #         self.setEolMode()
@@ -101,10 +105,13 @@ class ScintillaWidget(QsciScintilla):
         # Set the number of the first visible line to linenr.
 #         self.setFirstVisibleLine()
         # 设置折叠边距的折叠样式,参考http://pyqt.sourceforge.net/Docs/QScintilla2/classQsciScintilla.html#ae478a896ae32a30e8a375049a3d477e0
-        self.setFolding(self.CircledTreeFoldStyle, 2)  # 圆形正负号
+        self.setFolding(self.BoxedTreeFoldStyle, 2)  # 方形正负号
         # The fold margin may be drawn as a one pixel sized checkerboard
         # pattern of two colours, fore and back.
-        self.setFoldMarginColors(Qt.red, Qt.yellow)
+        # 折叠前后颜色?
+        self.setFoldMarginColors(QColor("#222222"), QColor("#676A6D"))
+        # 设置字体
+        self.setFont(font)
         # Sets the background colour of an active hotspot area to col.
 #         self.setHotspotBackgroundColor()
         # Sets the foreground colour of an active hotspot area to col.
@@ -120,9 +127,9 @@ class ScintillaWidget(QsciScintilla):
         # indentation guides.
         self.setIndentationGuides(True)
         # 缩进指南背景颜色Set the background colour of indentation guides to col.
-#         self.setIndentationGuidesBackgroundColor()
+        self.setIndentationGuidesBackgroundColor(QColor("#676A6D"))
         # 缩进指南前景颜色Set the foreground colour of indentation guides to col.
-#         self.setIndentationGuidesForegroundColor()
+        self.setIndentationGuidesForegroundColor(QColor("#676A6D"))
         # 不使用tab
         self.setIndentationsUseTabs(False)
         # 缩进空格数量
@@ -140,8 +147,9 @@ class ScintillaWidget(QsciScintilla):
 #         self.setIndicatorOutlineColor(col, indicatorNumber=-1)
         # 页边空白背景色
 #         self.setMarginBackgroundColor(int margin,col)
-        # Enables or disables, according to lnrs, the display of line numbers in margin margin.
-#         self.setMarginLineNumbers(int margin, bool lnrs)
+        # Enables or disables, according to lnrs, the display of line numbers
+        # in margin margin.
+        self.setMarginLineNumbers(0, True)
         # Sets the marker mask of margin margin to mask. Only those markers whose bit is set in the mask are displayed in the margin.
 #         self.setMarginMarkerMask(int margin, int mask)
         # 设置边距选项
@@ -149,13 +157,13 @@ class ScintillaWidget(QsciScintilla):
         # Set the number of margins to margins.设置边距
 #         self.setMargins(int margins)
         # 设置边距背景颜色
-        self.setMarginsBackgroundColor(Qt.gray)
+        self.setMarginsBackgroundColor(QColor("#222222"))
         #
 #         self.setMarginSensitivity(int margin, bool sens)
         # 设置边距字体
-#         self.setMarginsFont(font)
+        self.setMarginsFont(font)
         # 设置边距前景颜色
-        self.setMarginsForegroundColor(Qt.black)
+        self.setMarginsForegroundColor(QColor("#676A6D"))
         # Set the margin text of line line with the text text using the style number style.
 #         self.setMarginText(int line, const QString &text, int style)
         # Set the margin text of line line with the text text using the style style.
@@ -166,119 +174,112 @@ class ScintillaWidget(QsciScintilla):
 #         self.setMarginText(int line, const QList< QsciStyledText > &text)
         # 设置边距类型,参考http://pyqt.sourceforge.net/Docs/QScintilla2/classQsciScintilla.html#aedab060e87e0533083ea8f1398302090
 #         self.setMarginType(int maring, MarginType type)
-        # 设置边框宽度
-#         self.setMarginWidth(int margin, int width)
+        # 设置折叠区域宽度
+        self.setMarginWidth(2, 14)
 #         self.setMarginWidth(int margin, QString s)
-        # Set the background colour, including the alpha component, of marker markerNumber to col. If markerNumber is -1 then the colour of all markers is set. The default is white.
-#         self.setMarkerBackgroundColor(Qt.white,-1)
+        # Set the background colour, including the alpha component, of marker
+        # markerNumber to col. If markerNumber is -1 then the colour of all
+        # markers is set. The default is white.
+        self.setMarkerBackgroundColor(QColor("#222222"))
         # Set the foreground colour of marker markerNumber to col. If
         # markerNumber is -1 then the colour of all markers is set. The default
         # is black.
-#         self.setMarkerForegroundColor(Qt.black)
-
+        self.setMarkerForegroundColor(QColor("#676A6D"))
+        # Set the background colour used to display matched braces to col. It is ignored if an indicator is being used. The default is white.
+        # 设置用于显示匹配的大括号的背景颜色。如果indicator被使用，它将被忽略。默认为白色。
+        self.setMatchedBraceBackgroundColor(Qt.white)
+        # Set the foreground colour used to display matched braces to col. It is ignored if an indicator is being used. The default is red.
+        # 设置用于显示匹配括号的前景色，如果indicator被使用，它将被忽略。默认值是红色。
+        self.setMatchedBraceForegroundColor(Qt.red)
+        # Set the indicator used to display matched braces to indicatorNumber. The default is not to use an indicator.
+        # 设置用于显示匹配的括号indicatornumber指示器。默认是不使用指示器。
+        self.setMatchedBraceIndicator(False)
+        # Text entered by the user will overwrite existing text if overwrite is true.
+#         self.setOverwriteMode(bool overwrite)
+        # 设置Widget背景颜色,但是对lexer无效
+        self.setPaper(QColor("#222222"))
+        # 设置选中背景颜色
+        self.setSelectionBackgroundColor(QColor("#606060"))
+        # 设置选中前景颜色
+        self.setSelectionForegroundColor(Qt.white)
+        # Sets whether or not the selection is drawn up to the right hand border. filled is set if the selection is drawn to the border.
+        # 设置是否选择绘制到右边框。如果选择绘制到边框，则填充已设置。
+#         self.setSelectionToEol()
+        # 设置用于绘制制表符空格时可见的模式。默认是使用箭头。
+        # 参考http://pyqt.sourceforge.net/Docs/QScintilla2/classQsciScintilla.html#acb9f67f141d5e81f68342e9507a308d3
+#         self.setTabDrawMode()
+        # 如果缩进为真，则tab键将缩进一行，而不是插入制表符。
+        self.setTabIndents(True)
+        # 一个tab用4个空格代替
+        self.setTabWidth(4)
+        # Set the background colour used to display unmatched braces to col. It is ignored if an indicator is being used. The default is white.
+        # 设置用于显示非匹配括号的背景颜色。如果指示器被使用，它将被忽略。默认为白色。
+        self.setUnmatchedBraceBackgroundColor(Qt.white)
+        # Set the foreground colour used to display unmatched braces to col. It is ignored if an indicator is being used. The default is blue.
+        # 设置用于显示非匹配括号的前景色，如果指示器被使用，它将被忽略。默认是蓝色的。
+        self.setUnmatchedBraceForegroundColor(Qt.blue)
+        # Set the indicator used to display unmatched braces to
+        # indicatorNumber. The default is not to use an indicator.
+        self.setUnmatchedBraceIndicator(False)
         # 设置默认utf8编码
         self.setUtf8(True)
-
-    def i(self):
-        #         self.SendScintilla(self.SCI_SETCODEPAGE, self.SC_CP_UTF8)
-        # BRACE MATCHING
-        self.setBraceMatching(QsciScintilla.SloppyBraceMatch)
-        # CURRENT LINE
-        self.setCaretLineVisible(True)
-        self.setCaretLineBackgroundColor(QColor('#2D2D2D'))
-        self.setCaretForegroundColor(QColor('white'))
-        # TABS
-        self.setIndentationsUseTabs(False)
-        self.setIndentationWidth(4)
-        self.setTabIndents(True)
-        self.setAutoIndent(True)
-        self.setBackspaceUnindents(True)
-        self.setTabWidth(4)
-        # INDENTATION GUIDES
-        self.setIndentationGuides(True)
-        # FOLDING MARGIN
-        self.setFolding(QsciScintilla.PlainFoldStyle)
-        self.setMarginWidth(2, 8)  # (2,14)
-        # FOLDING MARKERS
-        self.markerDefine('-', QsciScintilla.SC_MARKNUM_FOLDEROPEN)
-        self.markerDefine('+', QsciScintilla.SC_MARKNUM_FOLDER)
-        self.markerDefine('-', QsciScintilla.SC_MARKNUM_FOLDEROPENMID)
-        self.markerDefine('+', QsciScintilla.SC_MARKNUM_FOLDEREND)
-        # FOLDING LINE DISABLE
-        self.SendScintilla(QsciScintilla.SCI_SETFOLDFLAGS, 0)
-        # WHITESPACE
-        self.setWhitespaceVisibility(QsciScintilla.WsVisible)
+        # 设置空白背景颜色
+#         self.setWhitespaceBackgroundColor()
+        # 设置空白前景颜色
+#         self.setWhitespaceForegroundColor()
+        # 设置用于表示可见的空白点的尺寸
         self.setWhitespaceSize(1)
-        # DISABLE HORIZONTAL SCROLLBAR
-        self.SendScintilla(QsciScintilla.SCI_SETHSCROLLBAR, 0)
+        # 设置模式的空白的可见性。默认的是空格是无形的。
+        self.setWhitespaceVisibility(self.WsVisible)
+        # 换行缩进模式设置为模式。默认的是WrapIndentFixed。
+        # 参考http://pyqt.sourceforge.net/Docs/QScintilla2/classQsciScintilla.html#a59b529ccfcb1f7896efb523025371a03
+        self.setWrapIndentMode(self.WrapIndentFixed)
+        # 设置换行模式
+        # 参考http://pyqt.sourceforge.net/Docs/QScintilla2/classQsciScintilla.html#a7081c7ff25b5f6bd5b3a6cbd478a9f42
+        self.setWrapMode(self.WrapWord)
+        # Set the visual flags displayed when a line is wrapped. endFlag
+        # determines if and where the flag at the end of a line is displayed.
+        # startFlag determines if and where the flag at the start of a line is
+        # displayed. indent is the number of characters a wrapped line is
+        # indented by. By default no visual flags are displayed.
+        # 设置线条包装时显示的视觉标志。endflag决定如果在一行的结束标志显示。startflag决定如果在一行的开始标志显示。缩进是被包装的行缩进的字符数。默认情况下，不会显示任何可视标志。
+        # 参考http://pyqt.sourceforge.net/Docs/QScintilla2/classQsciScintilla.html#ac4d1c67938c75806b2c139d0779d0478
+#         self.setWrapVisualFlags(endFlag, startFlag, indent=0)
 
-    def initStyle(self):
-        # FONT
+    def initFont(self):
         font = self.font() or QFont()
-        font.setFamily(Settings.FONT_FAMILY)
+        font.setFamily("Consolas")
         font.setFixedPitch(True)
         font.setPointSize(13)
-        self.setFont(font)
-        self.setMarginsFont(font)
+        return font
 
-        # DEFAULT BACKGROUND AND FOREGROUND
-        self.setPaper(QColor(Settings.BACKGROUND_COLOR))
-        self.setColor(QColor(Settings.FOREGROUND_COLOR))
-
-        # MARGIN LINE NUMBERS
-        fontmetrics = QFontMetrics(font)
-        self.setMarginsFont(font)
-        self.setMarginWidth(0, fontmetrics.width('00000') + 4)
-        self.setMarginLineNumbers(0, True)
-
-        # MARGIN BACKGROUND AND FOREGROUND
-        self.setMarginsBackgroundColor(QColor(Settings.MARGIN_BACKGROUND))
-        self.setMarginsForegroundColor(QColor(Settings.MARGIN_FOREGROUND))
-
-        # EDGE LINE
-        # self.setEdgeMode(QsciScintilla.EdgeLine)
-        # self.setEdgeColumn(150)
-        # self.setEdgeColor(QColor(EDGE_COLOR))
-
-        # SELECTION BACKGROUND AND FOREGROUND
-        self.setSelectionBackgroundColor(QColor(Settings.SEL_BACKGROUND))
-        self.setSelectionForegroundColor(QColor(Settings.SEL_FOREGROUND))
-
-        # TABS BACKGROUND AND FOREGROUND
-        self.setIndentationGuidesBackgroundColor(
-            QColor(Settings.IND_BACKGROUND))
-        self.setIndentationGuidesForegroundColor(
-            QColor(Settings.IND_FOREGROUND))
-
-        # FOLDING MARKERS BACKGROUND AND FOREGROUND
-        self.setMarkerBackgroundColor(QColor(Settings.MARKER_BACKGROUND))
-        self.setMarkerForegroundColor(QColor(Settings.MARGIN_FOREGROUND))
-        self.setFoldMarginColors(QColor(Settings.FOLD_MARGIN_BACKGROUND), QColor(
-            Settings.FOLD_MARGIN_BACKGROUND))
-
-        # set lexer style
+    def initStyle(self):
         self._lexer.setFont(self.font())
-        self._lexer.setPaper(QColor(Settings.BACKGROUND_COLOR))
-        for key, value in Settings.TEMPORARY.items():
+        self._lexer.setPaper(self.paper())
+        self._lexer.setColor(self.color())
+        TEMPORARY = {
+            "ClassName": "#52E3F6",
+            "Comment": "#B0C4DE",
+            "CommentBlock": "#F1E607",
+            "Decorator": "#FFFFFF",
+            "DoubleQuotedString": "#ECE47E",
+            "FunctionMethodName": "#A7EC21",
+            "HighlightedIdentifier": "#F1E607",
+            "Identifier": "#FFFFFF",
+            "Keyword": "#FF007F",
+            "Number": "#C48CFF",
+            "Operator": "#FF007F",
+            "SingleQuotedString": "#ECE47E",
+            "TripleDoubleQuotedString": "#F1E607",
+            "TripleSingleQuotedString": "#F1E607",
+            "UnclosedString": "#F1E607"
+        }
+        for k, v in TEMPORARY.items():
             try:
-                self._lexer.setColor(QColor(value), getattr(self._lexer, key))
+                print(QColor(v), k)
+                self._lexer.setColor(QColor(v), getattr(self._lexer, k))
             except Exception as e:
-                print('Warning: ', e)
-
-    def event(self, event):
-        if(event.type() == QEvent.Gesture):
-            return self.gestureEvent(event)
-        return super(ScintillaWidget, self).event(event)
-
-    def gestureEvent(self, event):
-        '''gesture event'''
-        event = event.gesture(Qt.TapAndHoldGesture)
-        if event:  # mouse long click
-            # show popup widget
-            pos = event.position()
-            if pos and not pos.isNull():
-                self.toolPopupWidget.show(pos.toPoint())
-        return True
+                print(e)
 
 
 if __name__ == '__main__':

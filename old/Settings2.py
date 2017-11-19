@@ -32,20 +32,20 @@ MARKER_FOREGROUND = "#676a6d"
 
 TEMPORARY = {
     "ClassName": "#52E3F6",
-    "Keyword": "#FF007F",
     "Comment": "#B0C4DE",
-    "Number": "#C48CFF",
-    "SingleQuotedString": "#ECE47E",
-    "DoubleQuotedString": "#ECE47E",
-    "TripleSingleQuotedString": "#F1E607",
-    "TripleDoubleQuotedString": "#F1E607",
-    "FunctionMethodName": "#A7EC21",
-    "Operator": "#FF007F",
-    "Identifier": "#FFFFFF",
     "CommentBlock": "#F1E607",
-    "UnclosedString": "#F1E607",
+    "Decorator": "#FFFFFF",
+    "DoubleQuotedString": "#ECE47E",
+    "FunctionMethodName": "#A7EC21",
     "HighlightedIdentifier": "#F1E607",
-    "Decorator": "#FFFFFF"
+    "Identifier": "#FFFFFF",
+    "Keyword": "#FF007F",
+    "Number": "#C48CFF",
+    "Operator": "#FF007F",
+    "SingleQuotedString": "#ECE47E",
+    "TripleDoubleQuotedString": "#F1E607",
+    "TripleSingleQuotedString": "#F1E607",
+    "UnclosedString": "#F1E607"
 }
 
 Symbols = {
