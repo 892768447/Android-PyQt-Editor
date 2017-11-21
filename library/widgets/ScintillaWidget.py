@@ -193,7 +193,7 @@ class ScintillaWidget(QsciScintilla):
         self.setMatchedBraceForegroundColor(Qt.red)
         # Set the indicator used to display matched braces to indicatorNumber. The default is not to use an indicator.
         # 设置用于显示匹配的括号indicatornumber指示器。默认是不使用指示器。
-        self.setMatchedBraceIndicator(False)
+        self.setMatchedBraceIndicator(self.RightTriangle)
         # Text entered by the user will overwrite existing text if overwrite is true.
 #         self.setOverwriteMode(bool overwrite)
         # 设置Widget背景颜色,但是对lexer无效
@@ -276,7 +276,6 @@ class ScintillaWidget(QsciScintilla):
         }
         for k, v in TEMPORARY.items():
             try:
-                print(QColor(v), k)
                 self._lexer.setColor(QColor(v), getattr(self._lexer, k))
             except Exception as e:
                 print(e)
@@ -291,7 +290,7 @@ if __name__ == '__main__':
     file = 'ScintillaWidget.py'
     with open(file, 'rb') as fp:
         text = fp.read()
-        encoding = chardet.detect(text)
+        encoding = chardet.detect(text) or {}
         print('encoding: ', encoding)
-        w.setText(text.decode(encoding['encoding']))
+        w.setText(text.decode(encoding.get('encoding','utf-8')))
     sys.exit(app.exec_())
