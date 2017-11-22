@@ -12,29 +12,39 @@ Created on 2017年11月10日
 import sys
 
 from PyQt5.QtCore import Qt
+from PyQt5.QtGui import QFontDatabase
 from PyQt5.QtWidgets import QApplication
 import chardet
 
-from library.widgets.ScintillaWidget import ScintillaWidget
+from library.widgets.MainWindow import MainWindow
 
 
 __Author__ = "By: Irony.\"[讽刺]\nQQ: 892768447\nEmail: 892768447@qq.com"
 __Copyright__ = "Copyright (c) 2017 Irony.\"[讽刺]"
 __Version__ = "Version 1.0"
 
+
+def main():
+    try:
+        with open("style.qss", "rb") as fp:
+            text = fp.read()
+            encoding = chardet.detect(text) or {}
+        QApplication.setAttribute(Qt.AA_EnableHighDpiScaling, True)
+        app = QApplication(sys.argv)
+        # init font
+        QFontDatabase.addApplicationFont("fonts/Consola.ttf")
+        QFontDatabase.addApplicationFont("fonts/fontawesome-webfont.ttf")
+        # init style
+        app.setStyleSheet(text.decode(encoding.get("encoding", "utf-8")))
+        w = MainWindow()
+        w.show()
+        w._openFile("main.py")
+        sys.exit(app.exec_())
+    except SystemExit:
+        pass
+    except Exception as e:
+        print(e)
+
+
 if __name__ == '__main__':
-    with open('style.qss', 'rb') as fp:
-        text = fp.read()
-        encoding = chardet.detect(text) or {}
-    QApplication.setAttribute(Qt.AA_EnableHighDpiScaling,True)
-    app = QApplication(sys.argv)
-    app.setStyleSheet(text.decode(encoding.get('encoding','utf-8')))
-    w = ScintillaWidget()
-    w.show()
-    file = 'main.py'
-    with open(file, 'rb') as fp:
-        text = fp.read()
-        encoding = chardet.detect(text) or {}
-        print('encoding: ', encoding)
-        w.setText(text.decode(encoding.get('encoding','utf-8')))
-    sys.exit(app.exec_())
+    main()

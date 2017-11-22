@@ -9,8 +9,9 @@ Created on 2017年11月12日
 @file: library.widgets.TitleBar
 @description: 
 '''
+from PyQt5.QtGui import QPainter
 from PyQt5.QtWidgets import QWidget, QVBoxLayout, QPushButton, QLabel,\
-    QSpacerItem, QSizePolicy, QHBoxLayout
+    QSpacerItem, QSizePolicy, QHBoxLayout, QStyleOption, QStyle
 
 
 __Author__ = "By: Irony.\"[讽刺]\nQQ: 892768447\nEmail: 892768447@qq.com"
@@ -29,39 +30,41 @@ class TitleBar(QWidget):
         topLayout = QHBoxLayout(spacing=0)
         topLayout.setContentsMargins(0, 0, 0, 0)
         # menu button
-        self.menuButton = QPushButton(self.tr("Menu"),self)
+        self.menuButton = QPushButton(
+            "\uf03a", self, objectName="MenuButton")  # Menu
         # title label
-        self.titleLabel = QLabel(self.tr("New"),self)
+        self.titleLabel = QLabel("", self)  # New
         # center QSpacerItem
         item = QSpacerItem(40, 20, QSizePolicy.Expanding,
                            QSizePolicy.Minimum)
         # setting button
-        self.settingButton = QPushButton(self.tr("Setting"),self)
+        self.settingButton = QPushButton(
+            "\uf013", self, objectName="SettingButton")  # Setting
 
         topLayout.addWidget(self.menuButton)
         topLayout.addWidget(self.titleLabel)
         topLayout.addItem(item)
         topLayout.addWidget(self.settingButton)
 
-        bottomLayout=QHBoxLayout(spacing=0)
+        bottomLayout = QHBoxLayout(spacing=0)
         bottomLayout.setContentsMargins(0, 0, 0, 0)
-        #new file button
-        self.newButton = QPushButton(self.tr("New"),self)
-        #save file button
-        self.saveButton = QPushButton(self.tr("Save"),self)
+        # new file button
+        self.newButton = QPushButton("\uf15b", self)  # New
+        # save file button
+        self.saveButton = QPushButton("\uf0c7", self)  # Save
         # undo button
-        self.undoButton = QPushButton(self.tr("Undo"),self)
+        self.undoButton = QPushButton("\uf0e2", self)  # Undo
         # redo button
-        self.redoButton = QPushButton(self.tr("Redo"),self)
+        self.redoButton = QPushButton("\uf01e", self)  # Redo
         # select all button
-        self.selectButton = QPushButton(self.tr("Select All"),self)
-        #copy button
-        self.copyButton = QPushButton(self.tr("Copy"),self)
-        #cut button
-        self.cutButton = QPushButton(self.tr("Cut"),self)
-        #paste button
-        self.pasteButton=QPushButton(self.tr("Paste"),self)
-        
+        self.selectButton = QPushButton("\uf00b", self)  # Select All
+        # copy button
+        self.copyButton = QPushButton("\uf0c5", self)  # Copy
+        # cut button
+        self.cutButton = QPushButton("\uf0c4", self)  # Cut
+        # paste button
+        self.pasteButton = QPushButton("\uf0ea", self)  # Paste
+
         bottomLayout.addWidget(self.newButton)
         bottomLayout.addWidget(self.saveButton)
         bottomLayout.addWidget(self.undoButton)
@@ -71,9 +74,16 @@ class TitleBar(QWidget):
         bottomLayout.addWidget(self.cutButton)
         bottomLayout.addWidget(self.pasteButton)
         bottomLayout.addItem(item)
-        
+
         layout.addLayout(topLayout)
         layout.addLayout(bottomLayout)
+
+    def paintEvent(self, event):
+        option = QStyleOption()
+        option.initFrom(self)
+        painter = QPainter(self)
+        self.style().drawPrimitive(QStyle.PE_Widget, option, painter, self)
+        super(TitleBar, self).paintEvent(event)
 
 
 if __name__ == "__main__":

@@ -10,8 +10,9 @@ Created on 2017年11月12日
 @description: 
 '''
 from PyQt5.QtWidgets import QWidget, QVBoxLayout
-from library.widgets.TitleBar import TitleBar
+
 from library.widgets.EditorWidget import EditorWidget
+from library.widgets.TitleBar import TitleBar
 
 
 __Author__ = "By: Irony.\"[讽刺]\nQQ: 892768447\nEmail: 892768447@qq.com"
@@ -23,17 +24,19 @@ class MainWindow(QWidget):
 
     def __init__(self, *args, **kwargs):
         super(MainWindow, self).__init__(*args, **kwargs)
-        layout = QVBoxLayout(self,spacing=0)
+        layout = QVBoxLayout(self, spacing=0)
         layout.setContentsMargins(0, 0, 0, 0)
-        
-        #titlebar widget
+
+        # titlebar widget
         self.titleBar = TitleBar(self)
-        #editor widget
+        # editor widget
         self.editorWidget = EditorWidget(self)
-        
-        
+
         layout.addWidget(self.titleBar)
         layout.addWidget(self.editorWidget)
+
+    def _openFile(self, file):
+        self.editorWidget._openFile(file)
 
 
 if __name__ == "__main__":
